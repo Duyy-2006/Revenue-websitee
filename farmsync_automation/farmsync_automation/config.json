@@ -1,0 +1,73 @@
+{
+    "discord_webhook": "https://discord.com/api/webhooks/967820762734030899/lPujX41Md70Per8IZyU6jwMFHpvl-_5MFqQSzguUMGYZep1a_t0HHYzTFTJ8gPBolGrP",
+
+    "automation": {
+        "cycle_interval_min": 20,
+
+        "rules": {
+            "disk_full_enabled": true,
+            "disk_full_pct": 85,
+
+            "restart_vps_enabled": true,
+            "heartbeat_fresh_min": 10,
+
+            "ram_move_enabled": true,
+            "ram_high_pct": 88,
+            "ram_target_pct": 78,
+
+            "ram_fill_enabled": true,
+            "fill_max_per_cycle": 10,
+            "move_max_per_cycle": 10,
+
+            "empty_fill_enabled": true,
+            "empty_fill_amount": 20,
+
+            "low_online_enabled": true,
+            "online_warn_pct": 10,
+            "online_warn_cycles": 3,
+            "online_low_pct": 20,
+            "online_low_cycles": 6,
+
+            "swap_offline_enabled": false,
+            "swap_offline_threshold_hours": 3,
+            "swap_max_per_device": 5,
+
+            "dead_folder_cap_enabled": true,
+
+            "group_backup_enabled": true
+        },
+
+        "restart": {
+            "warn_after": 3,
+            "cooldown_after": 3,
+            "attention_pause_hours": 3,
+            "restart_grace_min": 60
+        },
+
+        "stock": {
+            "enabled": true,
+            "amount": 100,
+            "groups": ["Potion", "Murder Mystery 2", "Grow A Garden 2"]
+        },
+
+        "device_max_accounts": {
+            "m3": 60,
+            "m2": 25,
+            "m4": 40,
+            "Hoang1": 52,
+            "Hoang9": 50,
+            "Hoang20": 52,
+            "Hoang21": 50,
+            "Hoang22": 50,
+            "Hoang23": 50,
+            "Hoang24": 58
+        },
+
+        "skip_devices": ["test"]
+    },
+
+    "check_offline": {
+        "offline_threshold_hours": 3,
+        "target_groups": ["Potion", "Pet Farm"]
+    }
+}

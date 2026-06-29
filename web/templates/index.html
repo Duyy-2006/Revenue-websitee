@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revenue Dashboard</title>
+    <link rel="stylesheet" href="/static/fa/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<nav class="sidebar">
+    <div class="logo"><i class="fas fa-chart-line"></i><span>Revenue</span></div>
+    <a href="#" class="nav-item active" data-page="dashboard"><i class="fas fa-chart-line"></i><span>Dashboard</span></a>
+    <a href="#" class="nav-item" data-page="devices"><i class="fas fa-server"></i><span>Devices</span><span class="nav-badge" id="nav-devices">0</span></a>
+    <a href="#" class="nav-item" data-page="offers"><i class="fas fa-tags"></i><span>Offers</span><span class="nav-badge" id="nav-offers">0</span></a>
+    <a href="#" class="nav-item" data-page="accounts"><i class="fas fa-user-clock"></i><span>Accounts</span><span class="nav-badge" id="nav-accounts">0</span></a>
+    <a href="#" class="nav-item" data-page="settings"><i class="fas fa-cog"></i><span>Settings</span></a>
+    <div class="sidebar-footer">
+        <span class="freeze-pill" id="freeze-pill" onclick="toggleChromeFreeze()" title="Freeze all Chrome activity so you can run login.bat without it being taskkilled. Re-click to resume.">
+            <i class="fas fa-snowflake"></i>
+            <span id="freeze-label">Chrome: …</span>
+        </span>
+        <div class="platform-dots">
+            <span class="dot" id="dot-funpay" title="FunPay"></span>
+            <span class="dot" id="dot-funpay2" title="FunPay 2"></span>
+            <span class="dot" id="dot-u7buy" title="u7buy"></span>
+            <span class="dot" id="dot-eldorado" title="Eldorado"></span>
+            <span class="dot" id="dot-g2g" title="G2G"></span>
+            <span class="dot" id="dot-playerauctions" title="PlayerAuctions"></span>
+        </div>
+    </div>
+</nav>
+
+<main class="content">
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <section id="page-dashboard" class="page active">
+        <div class="page-header">
+            <h1>Dashboard</h1>
+            <div class="header-actions">
+                <button class="btn btn-accent" onclick="syncAllSales()"><i class="fas fa-download"></i> Sync All Sales</button>
+                <button class="btn btn-sm" onclick="loadDashboard()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+        </div>
+
+        <!-- Revenue totals -->
+        <div class="stats-grid">
+            <div class="stat-card accent"><div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+                <div class="stat-info"><span class="stat-value" id="rev-today">$0</span><span class="stat-label">Today</span>
+                    <small class="stat-sub" id="rev-today-sales"></small></div></div>
+            <div class="stat-card purple"><div class="stat-icon"><i class="fas fa-calendar-week"></i></div>
+                <div class="stat-info"><span class="stat-value" id="rev-week">$0</span><span class="stat-label">This Week</span>
+                    <small class="stat-sub" id="rev-week-sales"></small></div></div>
+            <div class="stat-card green"><div class="stat-icon"><i class="fas fa-calendar"></i></div>
+                <div class="stat-info"><span class="stat-value" id="rev-month">$0</span><span class="stat-label">This Month</span>
+                    <small class="stat-sub" id="rev-month-sales"></small></div></div>
+            <div class="stat-card blue"><div class="stat-icon"><i class="fas fa-coins"></i></div>
+                <div class="stat-info"><span class="stat-value" id="yc-balance">…</span><span class="stat-label">Points</span>
+                    <small class="stat-sub" id="yc-balance-usd"></small></div></div>
+            <div class="stat-card green" id="zp-card" title="ZP ZeroSolver — auto-submits CAPTCHA-locked accounts to the solver every 20 min. Pause / run from Settings.">
+                <div class="stat-icon"><i class="fas fa-robot"></i></div>
+                <div class="stat-info"><span class="stat-value" id="zp-balance">…</span>
+                    <span class="stat-label">ZP Solver <span class="zp-dot" id="zp-dot" title=""></span></span>
+                    <small class="stat-sub" id="zp-sub"></small></div></div>
+        </div>
+
+        <!-- FarmSync device stats -->
+        <div class="stats-grid">
+            <div class="stat-card blue"><div class="stat-icon"><i class="fas fa-server"></i></div>
+                <div class="stat-info"><span class="stat-value" id="fs-total-devices">0</span><span class="stat-label">Total Devices</span></div></div>
+            <div class="stat-card teal"><div class="stat-icon"><i class="fas fa-users"></i></div>
+                <div class="stat-info"><span class="stat-value" id="fs-total-accounts">0</span><span class="stat-label">Total Accounts</span></div></div>
+            <div class="stat-card green"><div class="stat-icon"><i class="fas fa-circle-play"></i></div>
+                <div class="stat-info"><span class="stat-value" id="fs-running-accounts">0</span><span class="stat-label">Running Accounts</span></div></div>
+            <div class="stat-card yellow"><div class="stat-icon"><i class="fas fa-chart-column"></i></div>
+                <div class="stat-info"><span class="stat-value" id="fs-uptime">0%</span><span class="stat-label">Uptime</span></div></div>
+        </div>
+
+        <!-- Revenue + Sales (each independently switches Today/Week/Month) -->
+        <div class="today-grid">
+            <div class="card today-revenue">
+                <div class="panel-head">
+                    <h3><i class="fas fa-dollar-sign"></i> Revenue <span class="muted" id="rev-period-total"></span></h3>
+                    <div class="period-tabs" data-target="revenue">
+                        <button class="period-tab active" data-period="today">Today</button>
+                        <button class="period-tab" data-period="week">Week</button>
+                        <button class="period-tab" data-period="month">Month</button>
+                        <input type="date" class="period-date" data-target="revenue" title="Pick a specific date">
+                    </div>
+                </div>
+                <div class="rev-rows" id="today-rev-rows"></div>
+            </div>
+            <div class="card today-sales">
+                <div class="panel-head">
+                    <h3><i class="fas fa-receipt"></i> Sales <span class="muted" id="today-sales-count"></span></h3>
+                    <div class="sales-controls">
+                        <input type="text" id="sales-search" class="sales-search" placeholder="search…" oninput="setSalesSearch(this.value)" title="Search description / platform / category">
+                        <select id="sales-plat-filter" class="sales-cat-select" onchange="setSalesPlatform(this.value)" title="Filter by platform">
+                            <option value="all">All platforms</option>
+                        </select>
+                        <select id="sales-cat-filter" class="sales-cat-select" onchange="setSalesCategory(this.value)" title="Filter by category">
+                            <option value="all">All categories</option>
+                        </select>
+                        <div class="period-tabs" data-target="sales">
+                            <button class="period-tab active" data-period="today">Today</button>
+                            <button class="period-tab" data-period="week">Week</button>
+                            <button class="period-tab" data-period="month">Month</button>
+                            <input type="date" class="period-date" data-target="sales" title="Pick a specific date">
+                        </div>
+                    </div>
+                </div>
+                <div class="table-wrap today-sales-wrap">
+                    <table>
+                        <thead class="sticky-header"><tr>
+                            <th class="sortable" data-sort="sold_at" onclick="setSalesSort('sold_at')">Date <i class="sort-icon">↕</i></th>
+                            <th class="sortable" data-sort="username" onclick="setSalesSort('username')">Description <i class="sort-icon">↕</i></th>
+                            <th class="sortable" data-sort="platform" onclick="setSalesSort('platform')">Platform <i class="sort-icon">↕</i></th>
+                            <th class="sortable" data-sort="category" onclick="setSalesSort('category')">Category <i class="sort-icon">↕</i></th>
+                            <th class="sortable" data-sort="price" onclick="setSalesSort('price')">Price <i class="sort-icon">↕</i></th>
+                        </tr></thead>
+                        <tbody id="today-sales-body"><tr><td colspan="5" class="empty">No sales</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Revenue by category -->
+        <div class="card cat-rev-panel" style="margin-top:16px">
+            <div class="panel-head">
+                <h3><i class="fas fa-layer-group"></i> <span id="cat-rev-title">Revenue by Platform</span> <span class="muted" id="cat-rev-total"></span></h3>
+                <div class="cat-rev-controls">
+                    <div class="period-tabs cat-mode-tabs" id="cat-rev-mode-tabs">
+                        <button class="period-tab" data-cat-mode="category" onclick="setCategoryMode('category')">By Category</button>
+                        <button class="period-tab active" data-cat-mode="platform" onclick="setCategoryMode('platform')">By Platform</button>
+                    </div>
+                    <div class="period-tabs" id="cat-rev-tabs">
+                        <button class="period-tab active" data-cat-period="today" onclick="setCategoryPeriod('today')">Today</button>
+                        <button class="period-tab" data-cat-period="week" onclick="setCategoryPeriod('week')">Week</button>
+                        <button class="period-tab" data-cat-period="month" onclick="setCategoryPeriod('month')">Month</button>
+                        <button class="period-tab" data-cat-period="all" onclick="setCategoryPeriod('all')">All</button>
+                    </div>
+                </div>
+            </div>
+            <div class="cat-rev-rows" id="cat-rev-rows"><div class="empty">Loading…</div></div>
+        </div>
+
+        <!-- Sync log -->
+        <div class="card boost-panel" style="margin-top:16px">
+            <div class="boost-header">
+                <h3 style="margin:0;border:none;padding:0"><i class="fas fa-list-ul"></i> Sync Log</h3>
+            </div>
+            <div id="automation-log" class="auto-log"></div>
+        </div>
+    </section>
+
+    <!-- ═══ DEVICES ═══ -->
+    <section id="page-devices" class="page">
+        <div class="page-header">
+            <h1>Devices</h1>
+            <div class="header-actions">
+                <span class="automation-pill" id="automation-pill" onclick="toggleAutomation()" title="Click to pause/resume FarmSync Automation">
+                    <span class="dot" id="automation-dot"></span>
+                    <span id="automation-label">Automation: …</span>
+                </span>
+                <input type="text" id="device-search" class="device-search" placeholder="search devices…" oninput="setDeviceSearch(this.value)" title="Search name / group / OS / status">
+                <button class="btn btn-sm" id="devices-sort-btn" onclick="toggleDevicesSort()" title="Toggle device ordering: offline-first ↔ by tier"><i class="fas fa-sort"></i> <span id="devices-sort-label">Offline first</span></button>
+                <button class="btn btn-sm icon-only" onclick="loadDevices(true)" title="Refresh"><i class="fas fa-rotate"></i></button>
+                <span class="devices-count" id="devices-count">0 devices</span>
+            </div>
+        </div>
+        <div class="card group-backups-card" style="margin-bottom:14px">
+            <div class="panel-head">
+                <h3><i class="fas fa-box-archive"></i> Group Backups <span class="muted" id="gb-summary"></span></h3>
+                <button class="btn btn-sm icon-only" onclick="loadGroupBackups()" title="Refresh"><i class="fas fa-rotate"></i></button>
+            </div>
+            <div id="group-backups-body" class="gb-body"><div class="empty">Loading…</div></div>
+            <p class="hint" style="margin:8px 12px 4px">Pick a backup for a group → it's <strong>force-applied to every device in that group</strong> on a different one (re-images them, interrupting any farming), and <strong>re-applied after each Restart VPS</strong>. Leave as "—" to disable for a group.</p>
+        </div>
+        <div id="devices-container" class="devices-by-tier">
+            <div class="empty">Loading devices…</div>
+        </div>
+    </section>
+
+    <!-- ═══ OFFERS ═══ -->
+    <section id="page-offers" class="page">
+        <div class="page-header">
+            <h1>Live Offers</h1>
+            <div class="header-actions">
+                <button class="btn btn-accent" onclick="refreshAllOffers()"><i class="fas fa-sync-alt"></i> Refresh All</button>
+                <button class="btn btn-sm" onclick="clearAllOffers()" title="Clear cached offers (after a bad scrape)"><i class="fas fa-trash"></i> Clear All</button>
+                <span class="devices-count" id="offers-total">0 offers</span>
+            </div>
+        </div>
+        <div class="offers-stats" id="offers-stats"></div>
+        <div class="card" style="margin-top:14px">
+            <div class="panel-head">
+                <h3><i class="fas fa-list"></i> Offers <span class="muted" id="offers-shown"></span></h3>
+                <input type="text" id="offers-filter" placeholder="filter title / id / platform…" class="period-date" style="width:240px">
+            </div>
+            <div class="offers-tabs" id="offers-tabs"></div>
+            <div class="offers-tabs offers-tabs-section" id="offers-section-tabs"></div>
+            <div class="table-wrap offers-wrap">
+                <table>
+                    <thead class="sticky-header">
+                        <tr>
+                            <th class="sortable" data-sort="platform">Platform <i class="fas fa-sort sort-icon"></i></th>
+                            <th class="sortable" data-sort="offer_id">ID <i class="fas fa-sort sort-icon"></i></th>
+                            <th class="sortable" data-sort="title">Title <i class="fas fa-sort sort-icon"></i></th>
+                            <th class="sortable" data-sort="price">Price <i class="fas fa-sort sort-icon"></i></th>
+                            <th class="sortable" data-sort="live_seconds" title="How long this offer has been live (accumulates by the platform's scrape interval each time we see it)">Live Time <i class="fas fa-sort sort-icon"></i></th>
+                            <th class="sortable" data-sort="updated_ts">Updated <i class="fas fa-sort sort-icon"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody id="offers-body"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ ACCOUNTS ═══ -->
+    <section id="page-accounts" class="page">
+        <div class="page-header">
+            <h1>Accounts</h1>
+            <div class="header-actions">
+                <button class="btn btn-sm icon-only" onclick="loadAccounts()" title="Refresh"><i class="fas fa-rotate"></i></button>
+                <span class="devices-count" id="accounts-total">0 accounts</span>
+            </div>
+        </div>
+        <div class="card" style="margin-top:14px">
+            <div class="panel-head">
+                <h3><i class="fas fa-user-clock"></i> Farm time <span class="muted" id="accounts-shown"></span></h3>
+                <input type="text" id="accounts-filter" placeholder="filter username / device / group…" class="period-date" style="width:260px">
+            </div>
+            <div class="table-wrap accounts-wrap">
+                <table>
+                    <thead class="sticky-header">
+                        <tr>
+                            <th class="sortable" data-sort="username">Username <i class="fas fa-sort sort-icon"></i></th>
+                            <th class="sortable" data-sort="devices" title="All devices this account has ever been assigned to">Device(s) <i class="fas fa-sort sort-icon"></i></th>
+                            <th class="sortable" data-sort="groups" title="All groups this account has ever farmed under">Group(s) <i class="fas fa-sort sort-icon"></i></th>
+                            <th class="sortable" data-sort="live_seconds" title="Total time this account has been assigned to a device, accumulated each ~20-min automation cycle">Live Time <i class="fas fa-sort sort-icon"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody id="accounts-body"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody>
+                </table>
+            </div>
+            <div class="pagination" id="accounts-pagination"></div>
+        </div>
+    </section>
+
+    <!-- ═══ SETTINGS ═══ -->
+    <section id="page-settings" class="page">
+        <div class="page-header"><h1>Settings</h1></div>
+        <div class="settings-grid">
+            <div class="card">
+                <h3>Platform Connections</h3>
+                <div class="setting-row">
+                    <div class="setting-label"><span class="dot" id="status-funpay"></span><strong>FunPay</strong> <small class="hint">HTTP · cookie session</small></div>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-label"><span class="dot" id="status-funpay2"></span><strong>FunPay 2</strong> <small class="hint">HTTP · cookie session</small></div>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-label"><span class="dot" id="status-u7buy"></span><strong>u7buy</strong> <small class="hint">OpenAPI · Basic auth</small></div>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-label"><span class="dot" id="status-eldorado"></span><strong>Eldorado</strong> <small class="hint">Chrome Profile 3</small></div>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-label"><span class="dot" id="status-g2g"></span><strong>G2G</strong> <small class="hint">Chrome Profile 3</small></div>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-label"><span class="dot" id="status-playerauctions"></span><strong>PlayerAuctions</strong> <small class="hint">Chrome Profile 3</small></div>
+                </div>
+                <div class="config-actions">
+                    <button class="btn btn-accent" onclick="refreshAllPlatforms()"><i class="fas fa-sync-alt"></i> Refresh All</button>
+                </div>
+                <p class="hint" style="margin-top:12px">Chrome-based platforms (Eldorado / G2G / PA) use a dedicated profile at <code>C:\ChromeAutomation\Profile 3</code>. Run <code>login.bat</code> in each platform folder to sign in once — sessions persist.</p>
+            </div>
+            <div class="card">
+                <h3>Stats API</h3>
+                <div class="setting-row">
+                    <div class="setting-label"><span class="dot" id="status-trackstat"></span><strong>YummyTrackStat</strong> <small class="hint" id="trackstat-hint">checking…</small></div>
+                </div>
+                <div class="config-actions">
+                    <button class="btn btn-sm" onclick="checkTrackstatStatus(true)"><i class="fas fa-sync-alt"></i> Check now</button>
+                </div>
+                <p class="hint" style="margin-top:12px">YummyTrackStat per-account stats via Bearer token at <code>yummytrackstat\token.txt</code>. Auto-checked every 20&nbsp;min — if it shows expired, re-copy the token (no restart needed). Endpoints: <code>/api/trackstat/&lt;game&gt;</code> · <code>/api/trackstat/all</code> (all your games, stable) · <code>/api/trackstat/active</code> (only games running now).</p>
+            </div>
+            <div class="card">
+                <h3>ZP ZeroSolver</h3>
+                <div class="setting-row">
+                    <div class="setting-label"><span class="dot" id="status-zpsolver"></span><strong>ZeroSolver</strong> <small class="hint" id="zp-settings-hint">checking…</small></div>
+                </div>
+                <div class="config-actions">
+                    <button class="btn btn-sm" onclick="checkZpSolver(true)"><i class="fas fa-sync-alt"></i> Check now</button>
+                    <button class="btn btn-sm" id="zp-toggle-btn" onclick="toggleZpSolver()"><i class="fas fa-pause"></i> Pause</button>
+                    <button class="btn btn-sm btn-accent" onclick="runZpSolver(this)"><i class="fas fa-paper-plane"></i> Send now</button>
+                </div>
+                <p class="hint" style="margin-top:12px">Every 20&nbsp;min, accounts with a <code>CAPTCHA</code> error (assigned to a device, live cookie) are submitted to ZeroSolver's in-game solver. Accounts already in the queue are skipped; once their job finishes, still-captcha accounts are re-sent next cycle. Only successful solves are billed (~$0.0025 each). Key at <code>Zp auto faceunlock\api_solver.txt</code>.</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div class="toast-container" id="toast-container"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>

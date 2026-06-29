@@ -1,0 +1,148 @@
+# === Credentials & secrets ===
+**/cookie.txt
+**/cookie.json
+**/token.txt
+yummytrackstat/
+Zp auto faceunlock/
+funpay2/
+# Local scratch / debug helpers + one-off backups (never commit)
+debug_*.py
+liveoffers.txt
+web/_eldorado_phantoms_deleted.json
+web/_eldorado_cookies.json
+web/_g2g_token.json
+**/u7buy_apikey.txt
+**/*apikey*
+**/*credentials*
+account.txt
+account.txt.bak
+*.bak
+
+# === Database ===
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# === Account data (CSVs with usernames/passwords/stats) ===
+Adopt Me!_*.csv
+Sailor Piece_*.csv
+exported_accounts.csv
+filtered_out_accounts.csv
+live_inventory.csv
+*_export*.txt
+*_export*.csv
+eldorado/_export*.txt
+eldorado/_market_prices.json
+eldorado/uploaded_accounts.json
+eldorado/live_inventory.csv
+
+# === Logs ===
+*.log
+**/*.log
+maintainer_log.csv
+maintainer_state.json
+eldorado_maintainer.log
+eldorado_maintainer_state.json
+eldorado_multiplier_log.csv
+
+# === Scratch / probe output ===
+scripts/*_progress.json
+scripts/u7_*.json
+scripts/eldorado_offers.json
+scripts/eldorado_offers_preview.csv
+scripts/g2g_offers*.json
+scripts/funpay_*.html
+scripts/u7buy_*.log
+scripts/g2g_*.log
+scripts/eldorado_*.log
+scripts/_probe*
+results/
+eldorado/_probe*
+eldorado/_scrape*
+eldorado/output/
+eldorado/data/
+funpay/data/
+funpay/legacy/
+funpay/output/
+g2g/data/
+g2g/output/
+playerauctions/data/
+playerauctions/output/
+u7buy/output/
+u7buy/data/
+
+# === Dashboard runtime artifacts ===
+web/screenshots/
+web/data/
+
+# === Python ===
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+venv/
+.venv/
+env/
+.env
+
+# === IDE ===
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# === Old sibling repo (now deprecated; live code moved to farmsync_automation/) ===
+farmsync-automation/
+
+# === FarmSync Automation (in-repo) — runtime artifacts and secrets ===
+farmsync_automation/api_keys.txt
+farmsync_automation/**/api_keys.txt
+farmsync_automation/farmsync_automation/logs.txt
+farmsync_automation/farmsync_automation/unassigned_accounts.txt
+farmsync_automation/farmsync_automation/_state_devices.json
+farmsync_automation/farmsync_automation/_state_accounts.json
+farmsync_automation/farmsync_automation/_paused.flag
+farmsync_automation/farmsync_automation/_platform_status.json
+farmsync_automation/farmsync_automation/_chrome_frozen.flag
+farmsync_automation/farmsync_automation/_live_offers.json
+farmsync_automation/farmsync_automation/_live_offers.json.*
+farmsync_automation/farmsync_automation/_live_offers_history.json
+farmsync_automation/farmsync_automation/_live_offers_history.json.*
+farmsync_automation/farmsync_automation/_account_livetime.json
+farmsync_automation/farmsync_automation/_account_livetime.json.*
+farmsync_automation/farmsync_automation/_device_backups.json
+farmsync_automation/farmsync_automation/_device_backups.json.*
+farmsync_automation/farmsync_automation/_group_backups.json
+farmsync_automation/farmsync_automation/_group_applied.json
+web/data/backups/
+
+# === Temporary backup/restore points ===
+*.preupdate
+
+# === Debug-session artifacts (Claude-driven runs) ===
+_diag.json
+_log.json
+_log_dump.json
+_flask_test.out
+_flask_test.err
+_dbg.txt
+_offers.json
+
+# === Manual Flask debug logs ===
+flask*.out
+flask*.log
+flask*.log.err
+flask*.out.err
+flask*.err
+
+# === Chrome forensic debug log ===
+web/_chrome_debug.log
+web/_chrome_debug.log.*
+
+# === Claude local state ===
+.claude/
